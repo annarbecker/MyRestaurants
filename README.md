@@ -1,6 +1,6 @@
 # My Restaurants
 
-##### Local Restaurant Listings App, 4/18/2016
+##### Local Restaurant Listings App | April 18, 2016
 
 #### By Anna Becker
 
