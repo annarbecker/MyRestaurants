@@ -17,6 +17,12 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    buildTypes.each {
+        it.buildConfigField 'String', 'YELP_CONSUMER_KEY', YelpConsumerKey
+        it.buildConfigField 'String', 'YELP_CONSUMER_SECRET', YelpConsumerSecret
+        it.buildConfigField 'String', 'YELP_TOKEN', YelpToken
+        it.buildConfigField 'String', 'YELP_TOKEN_SECRET', YelpTokenSecret
+    }
 }
 
 repositories {
@@ -38,4 +44,11 @@ dependencies {
     androidTestCompile('com.android.support.test:runner:0.3') {
         exclude group: 'com.android.support', module: 'support-annotaitons'
     }
+    compile 'com.squareup.okhttp3:okhttp:3.1.2'
+    compile 'se.akerfeldt:okhttp-signpost:1.1.0'
+    compile 'com.android.support:recyclerview-v7:23.2.1'
+
+    compile 'com.squareup.retrofit2:retrofit:2.0.0-beta3'
+    compile 'com.squareup.okhttp3:okhttp:3.0.0-RC1'
+    compile 'com.squareup.picasso:picasso:2.5.2'
 }
