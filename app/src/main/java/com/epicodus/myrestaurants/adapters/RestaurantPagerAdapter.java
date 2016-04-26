@@ -12,10 +12,10 @@ import java.util.ArrayList;
 /**
  * Created by arbecker on 4/25/16.
  */
-public class RestuarantPagerAdapter extends FragmentPagerAdapter {
+public class RestaurantPagerAdapter extends FragmentPagerAdapter {
     private ArrayList<Restaurant> mRestaurants;
 
-    public RestuarantPagerAdapter(FragmentManager fm, ArrayList<Restaurant> restaurants) {
+    public RestaurantPagerAdapter(FragmentManager fm, ArrayList<Restaurant> restaurants) {
         super(fm);
         mRestaurants = restaurants;
     }
