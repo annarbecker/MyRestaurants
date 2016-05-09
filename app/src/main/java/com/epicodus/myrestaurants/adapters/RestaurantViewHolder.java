@@ -10,6 +10,7 @@ import android.widget.TextView;
 import com.epicodus.myrestaurants.R;
 import com.epicodus.myrestaurants.models.Restaurant;
 import com.epicodus.myrestaurants.ui.RestaurantDetailActivity;
+import com.epicodus.myrestaurants.util.ItemTouchHelperViewHolder;
 import com.squareup.picasso.Picasso;
 
 import org.parceler.Parcels;
@@ -22,7 +23,7 @@ import butterknife.ButterKnife;
 /**
  * Created by arbecker on 4/29/16.
  */
-public class RestaurantViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+public class RestaurantViewHolder extends RecyclerView.ViewHolder implements ItemTouchHelperViewHolder{
     private static final int MAX_WIDTH = 200;
     private static final int MAX_HEIGHT = 200;
 
@@ -30,26 +31,25 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder implements Vie
     @Bind(R.id.restaurantNameTextView) TextView mNameTextView;
     @Bind(R.id.categoryTextView) TextView mCategoryTextView;
     @Bind(R.id.ratingTextView) TextView mRatingTextView;
+
     private Context mContext;
-    ArrayList<Restaurant> mRestaurants = new ArrayList<>();
+    private ArrayList<Restaurant> mRestaurants = new ArrayList<>();
 
     public RestaurantViewHolder(View itemView, ArrayList<Restaurant> restaurants) {
         super(itemView);
         ButterKnife.bind(this, itemView);
         mContext = itemView.getContext();
         mRestaurants = restaurants;
-        itemView.setOnClickListener(this);
-    }
-
-    @Override
-    public void onClick(View v) {
-        if(v == itemView) {
-            int itemPosition = getLayoutPosition();
-            Intent intent = new Intent(mContext, RestaurantDetailActivity.class);
-            intent.putExtra("position", itemPosition + "");
-            intent.putExtra("restaurants", Parcels.wrap(mRestaurants));
-            mContext.startActivity(intent);
-        }
+        itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int itemPosition = getLayoutPosition();
+                Intent intent = new Intent(mContext, RestaurantDetailActivity.class);
+                intent.putExtra("position", itemPosition + "");
+                intent.putExtra("restaurants", Parcels.wrap(mRestaurants));
+                mContext.startActivity(intent);
+            }
+        });
     }
 
     public void bindRestaurant(Restaurant restaurant) {
@@ -64,5 +64,22 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder implements Vie
         mNameTextView.setText(restaurant.getName());
         mCategoryTextView.setText(restaurant.getCategories().get(0));
         mRatingTextView.setText("Rating: " + restaurant.getRating() + "/5");
+    }
+
+    @Override
+    public void onItemSelected() {
+        itemView.animate()
+                .alpha(0.7f)
+                .scaleX(0.9f)
+                .scaleY(0.9f)
+                .setDuration(500);
+    }
+
+    @Override
+    public void onItemClear() {
+        itemView.animate()
+                .alpha(1f)
+                .scaleX(1f)
+                .scaleY(1f);
     }
 }
