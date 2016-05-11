@@ -2,14 +2,19 @@ package com.epicodus.myrestaurants.adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.epicodus.myrestaurants.Constants;
 import com.epicodus.myrestaurants.R;
 import com.epicodus.myrestaurants.models.Restaurant;
 import com.epicodus.myrestaurants.ui.RestaurantDetailActivity;
+import com.epicodus.myrestaurants.ui.RestaurantDetailFragment;
 import com.epicodus.myrestaurants.util.ItemTouchHelperViewHolder;
 import com.squareup.picasso.Picasso;
 
@@ -26,6 +31,8 @@ import butterknife.ButterKnife;
 public class RestaurantViewHolder extends RecyclerView.ViewHolder implements ItemTouchHelperViewHolder{
     private static final int MAX_WIDTH = 200;
     private static final int MAX_HEIGHT = 200;
+    private int mOrientation;
+    private Integer mPosition;
 
     @Bind(R.id.restaurantImageView) ImageView mRestaurantImageView;
     @Bind(R.id.restaurantNameTextView) TextView mNameTextView;
@@ -38,18 +45,38 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder implements Ite
     public RestaurantViewHolder(View itemView, ArrayList<Restaurant> restaurants) {
         super(itemView);
         ButterKnife.bind(this, itemView);
+
         mContext = itemView.getContext();
         mRestaurants = restaurants;
+
+        mOrientation = itemView.getResources().getConfiguration().orientation;
+
+        if (mOrientation == Configuration.ORIENTATION_LANDSCAPE) {
+            createDetailFragment(0);
+        }
+
         itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int itemPosition = getLayoutPosition();
-                Intent intent = new Intent(mContext, RestaurantDetailActivity.class);
-                intent.putExtra("position", itemPosition + "");
-                intent.putExtra("restaurants", Parcels.wrap(mRestaurants));
-                mContext.startActivity(intent);
+                mPosition = getLayoutPosition();
+                if( mOrientation == Configuration.ORIENTATION_LANDSCAPE) {
+                    createDetailFragment(mPosition);
+                } else {
+                    Intent intent = new Intent(mContext, RestaurantDetailActivity.class);
+                    intent.putExtra(Constants.EXTRA_KEY_POSITION, mPosition.toString());
+                    intent.putExtra(Constants.EXTRA_KEY_RESTAURANTS, Parcels.wrap(mRestaurants));
+                    mContext.startActivity(intent);
+                }
+
             }
         });
+    }
+
+    private void createDetailFragment(int position) {
+        RestaurantDetailFragment detailFragment = RestaurantDetailFragment.newInstance(mRestaurants, position);
+        FragmentTransaction ft = ((FragmentActivity) mContext).getSupportFragmentManager().beginTransaction();
+        ft.replace(R.id.restaurantDetailContainer, detailFragment);
+        ft.commit();
     }
 
     public void bindRestaurant(Restaurant restaurant) {
