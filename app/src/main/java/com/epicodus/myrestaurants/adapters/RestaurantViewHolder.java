@@ -16,6 +16,7 @@ import com.epicodus.myrestaurants.models.Restaurant;
 import com.epicodus.myrestaurants.ui.RestaurantDetailActivity;
 import com.epicodus.myrestaurants.ui.RestaurantDetailFragment;
 import com.epicodus.myrestaurants.util.ItemTouchHelperViewHolder;
+import com.epicodus.myrestaurants.util.OnRestaurantSelectedListener;
 import com.squareup.picasso.Picasso;
 
 import org.parceler.Parcels;
@@ -25,14 +26,10 @@ import java.util.ArrayList;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-/**
- * Created by arbecker on 4/29/16.
- */
-public class RestaurantViewHolder extends RecyclerView.ViewHolder implements ItemTouchHelperViewHolder{
+public class RestaurantViewHolder extends RecyclerView.ViewHolder implements ItemTouchHelperViewHolder {
+
     private static final int MAX_WIDTH = 200;
     private static final int MAX_HEIGHT = 200;
-    private int mOrientation;
-    private Integer mPosition;
 
     @Bind(R.id.restaurantImageView) ImageView mRestaurantImageView;
     @Bind(R.id.restaurantNameTextView) TextView mNameTextView;
@@ -42,24 +39,34 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder implements Ite
     private Context mContext;
     private ArrayList<Restaurant> mRestaurants = new ArrayList<>();
 
-    public RestaurantViewHolder(View itemView, ArrayList<Restaurant> restaurants) {
+    private int mOrientation;
+    private Integer mPosition;
+    private OnRestaurantSelectedListener mRestaurantSelectedListener;
+
+
+    public RestaurantViewHolder(View itemView, ArrayList<Restaurant> restaurants, OnRestaurantSelectedListener restaurantSelectedListener) {
+
         super(itemView);
         ButterKnife.bind(this, itemView);
 
         mContext = itemView.getContext();
         mRestaurants = restaurants;
-
+        mRestaurantSelectedListener = restaurantSelectedListener;
         mOrientation = itemView.getResources().getConfiguration().orientation;
 
-        if (mOrientation == Configuration.ORIENTATION_LANDSCAPE) {
+        if (mOrientation == Configuration.ORIENTATION_LANDSCAPE){
             createDetailFragment(0);
         }
 
         itemView.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View v) {
+
                 mPosition = getLayoutPosition();
-                if( mOrientation == Configuration.ORIENTATION_LANDSCAPE) {
+                mRestaurantSelectedListener.onRestaurantSelected(mPosition, mRestaurants);
+
+                if (mOrientation == Configuration.ORIENTATION_LANDSCAPE) {
                     createDetailFragment(mPosition);
                 } else {
                     Intent intent = new Intent(mContext, RestaurantDetailActivity.class);
@@ -69,10 +76,12 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder implements Ite
                 }
 
             }
+
         });
+
     }
 
-    private void createDetailFragment(int position) {
+    private void createDetailFragment(int position){
         RestaurantDetailFragment detailFragment = RestaurantDetailFragment.newInstance(mRestaurants, position);
         FragmentTransaction ft = ((FragmentActivity) mContext).getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.restaurantDetailContainer, detailFragment);
@@ -80,7 +89,6 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder implements Ite
     }
 
     public void bindRestaurant(Restaurant restaurant) {
-        Picasso.with(mContext).load(restaurant.getImageUrl()).into(mRestaurantImageView);
 
         Picasso.with(mContext)
                 .load(restaurant.getImageUrl())
@@ -109,4 +117,5 @@ public class RestaurantViewHolder extends RecyclerView.ViewHolder implements Ite
                 .scaleX(1f)
                 .scaleY(1f);
     }
+
 }
