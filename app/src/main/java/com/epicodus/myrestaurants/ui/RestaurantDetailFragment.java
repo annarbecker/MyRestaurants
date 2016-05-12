@@ -57,6 +57,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 
 public class RestaurantDetailFragment extends Fragment implements View.OnClickListener {
+    private String mSource;
 
     private static final int MAX_WIDTH = 400;
     private static final int MAX_HEIGHT = 300;
@@ -76,12 +77,13 @@ public class RestaurantDetailFragment extends Fragment implements View.OnClickLi
     private Integer mPosition;
     private ArrayList<Restaurant> mRestaurants;
 
-    public static RestaurantDetailFragment newInstance(ArrayList<Restaurant> restaurants, Integer position) {
+    public static RestaurantDetailFragment newInstance(ArrayList<Restaurant> restaurants, Integer position, String source) {
         RestaurantDetailFragment restaurantDetailFragment = new RestaurantDetailFragment();
         Bundle args = new Bundle();
 
         args.putParcelable(Constants.EXTRA_KEY_RESTAURANTS, Parcels.wrap(restaurants));
         args.putInt(Constants.EXTRA_KEY_POSITION, position);
+        args.putString(Constants.KEY_SOURCE, source);
 
         restaurantDetailFragment.setArguments(args);
         return restaurantDetailFragment;
@@ -94,13 +96,20 @@ public class RestaurantDetailFragment extends Fragment implements View.OnClickLi
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         mPosition = getArguments().getInt(Constants.EXTRA_KEY_POSITION);
         mRestaurant = mRestaurants.get(mPosition);
+        mSource = getArguments().getString(Constants.KEY_SOURCE);
+        setHasOptionsMenu(true);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_restaurant_detail, container, false);
         ButterKnife.bind(this, view);
-        mSaveRestaurantButton.setOnClickListener(this);
+
+        if (mSource.equals(Constants.SOURCE_SAVED)) {
+            mSaveRestaurantButton.setVisibility(View.GONE);
+        } else {
+            mSaveRestaurantButton.setOnClickListener(this);
+        }
 
         Picasso.with(view.getContext())
                 .load(mRestaurant.getImageUrl())
